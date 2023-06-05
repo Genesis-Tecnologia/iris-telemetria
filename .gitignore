@@ -1,68 +1,8 @@
-# Django
-*.log
-*.pot
-*.pyc
-__pycache__
-db.sqlite3
-media
-backend/api/__pycache__/*
-backend/api/migrations/__pycache__/*
-backend/backend/__pycache__/*
+# node_modules
+node_modules/*
 
-# Pycharm
-.idea/*
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
-.idea/**/aws.xml
-.idea/**/contentModel.xml
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/dbnavigator.xml
-.idea/**/gradle.xml
-.idea/**/libraries
-
-# Python
-*.py[cod] 
-*$py.class 
-
-# Distribution / packaging 
-.Python build/ 
-develop-eggs/ 
-dist/ 
-downloads/ 
-eggs/ 
-.eggs/ 
-lib/ 
-lib64/ 
-parts/ 
-sdist/ 
-var/ 
-share/
-*.egg-info/ 
-.installed.cfg 
-*.egg 
-*.manifest 
-*.spec 
-
-# Pip Installer logs 
-pip-log.txt 
-pip-delete-this-directory.txt 
-
-# environment
+# Environment
 .env 
-.venv 
-env/ 
-venv/ 
-ENV/ 
-env.bak/ 
-venv.bak/ 
 
 # vscode
 .vscode/* 

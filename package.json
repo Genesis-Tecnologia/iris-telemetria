@@ -1,0 +1,32 @@
+{
+  "name": "telemetria",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KevNik/telemetria.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KevNik/telemetria/issues"
+  },
+  "homepage": "https://github.com/KevNik/telemetria#readme",
+  "dependencies": {
+    "@prisma/client": "^4.15.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.8",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "prisma": "^4.15.0"
+  }
+}

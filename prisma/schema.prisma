@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model telemetrias {
+  id                           BigInt   @id(map: "api_telemetria_pkey") @default(autoincrement())
+  tipo                         String   @db.VarChar(10)
+  captura_data_hora            DateTime @db.Timestamptz(6)
+  registro_data_hora           DateTime @db.Timestamptz(6)
+  envio_tentativa_data_hora    DateTime @db.Timestamptz(6)
+  envio_data_hora              DateTime @db.Timestamptz(6)
+  placa                        String   @db.VarChar(255)
+  placa_tipo                   String   @db.VarChar(25)
+  placa_totalmente_reconhecida Boolean
+  sentido                      String   @db.VarChar(255)
+  camera_nome                  String   @db.VarChar(255)
+  camera_codigo                String   @db.VarChar(255)
+  veiculo_tipo                 String   @db.VarChar(50)
+  veiculo_cor                  String   @db.VarChar(50)
+  velocidade                   String   @db.VarChar(50)
+  faixa                        String   @db.VarChar(10)
+  ultimo_enviado_id            Int
+  arquivo_nome                 String   @db.VarChar(255)
+  status_cpu                   String
+  status_ram                   String
+  status_disco                 String
+  status_rede                  String
+  ping_sefaz                   Boolean
+  ping_camera                  Boolean
+  camera_latitude              String   @db.VarChar(255)
+  camera_longitude             String   @db.VarChar(255)
+  camera_endereco              String   @db.VarChar(255)
+  created_at                   DateTime @default(now())
+}
