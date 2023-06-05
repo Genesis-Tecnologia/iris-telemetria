@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "directories": {
     "lib": "lib"
   },
@@ -22,9 +21,11 @@
   "homepage": "https://github.com/KevNik/telemetria#readme",
   "dependencies": {
     "@prisma/client": "^4.15.0",
+    "compression": "^1.7.4",
     "cors": "^2.8.5",
     "dayjs": "^1.11.8",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "helmet": "^7.0.0"
   },
   "devDependencies": {
     "prisma": "^4.15.0"
