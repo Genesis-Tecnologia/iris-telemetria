@@ -80,10 +80,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'telemetrias',
-	'USER': 'telemetrias',
-	'PASSWORD': 'G&nesis#$%',
-	'HOST':'127.0.0.1',
-	'PORT': '5435'
+        'USER': 'telemetrias',
+        'PASSWORD': 'G&nesis#$%',
+        'HOST':'127.0.0.1',
+        'PORT': '5435'
     }
 }
 

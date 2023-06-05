@@ -1,4 +1,4 @@
-#!/home/keven/genesis/telemetria-backend/bin/python
+#!/home/keven/genesis/telemetria/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
