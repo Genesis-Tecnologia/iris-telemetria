@@ -8,10 +8,10 @@ router.post('/', async (req, res) => {
 
   const telemetria = {
     ...body,
-    captura_data_hora: dayjs(body.captura_data_hora).toISOString(),
-    registro_data_hora: dayjs(body.registro_data_hora).toISOString(),
-    envio_tentativa_data_hora: dayjs(body.registro_data_hora).toISOString(),
-    envio_data_hora: dayjs(body.registro_data_hora).toISOString(),
+    captura_data_hora: dayjs(body.captura_data_hora).toISOString() || body.captura_data_hora,
+    registro_data_hora: dayjs(body.registro_data_hora).toISOString() || body.registro_data_hora,
+    envio_tentativa_data_hora: dayjs(body.envio_tentativa_data_hora).toISOString() || body.envio_tentativa_data_hora,
+    envio_data_hora: dayjs(body.envio_data_hora).toISOString() || body.envio_data_hora,
   }
 
   let resultado;
