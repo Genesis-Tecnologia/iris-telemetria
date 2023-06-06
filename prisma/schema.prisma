@@ -30,8 +30,8 @@ model telemetrias {
   status_ram                   String
   status_disco                 String
   status_rede                  String
-  ping_sefaz                   Boolean
-  ping_camera                  Boolean
+  ping_sefaz                   String
+  ping_camera                  String
   camera_latitude              String   @db.VarChar(255)
   camera_longitude             String   @db.VarChar(255)
   camera_endereco              String   @db.VarChar(255)

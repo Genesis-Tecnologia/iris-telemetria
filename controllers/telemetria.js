@@ -6,7 +6,7 @@ const dayjs = require('dayjs');
 router.post('/', async (req, res) => {
   const { body } = req;
 
-  const telemetria = {
+  const telemetria = {  
     ...body,
     captura_data_hora: body.captura_data_hora !== null ? dayjs(body.captura_data_hora).toISOString() : body.captura_data_hora,
     registro_data_hora: body.registro_data_hora !== null ? dayjs(body.registro_data_hora).toISOString() : body.registro_data_hora,
