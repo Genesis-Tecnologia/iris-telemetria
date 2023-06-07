@@ -3,7 +3,7 @@ const router = express.Router();
 const prisma = require('../prisma/connection.js')
 const dayjs = require('dayjs');
 
-router.post('/', async (req, res) => {
+router.post('/ocr', async (req, res) => {
   const { body } = req;
 
   const telemetria = {  
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
   let resultado;
 
   try {
-    resultado = await prisma.telemetrias.create({
+    resultado = await prisma.telemetrias_ocr.create({
       data: telemetria
     });
   } catch (error) {
@@ -27,6 +27,24 @@ router.post('/', async (req, res) => {
   resultado.id = parseInt(resultado.id)
 
   return res.json(resultado)
-})
+});
+
+router.post('/hardware', async (req, res) => {
+  const { body } = req;
+
+  let resultado;
+
+  try {
+    resultado = await prisma.telemetrias_hardware.create({
+      data: body
+    });
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json(error.message);
+  }
+
+  return res.json(resultado);
+
+});
 
 module.exports = router;

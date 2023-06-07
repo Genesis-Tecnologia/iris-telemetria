@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model telemetrias {
+model telemetrias_ocr {
   id                           BigInt    @id(map: "api_telemetria_pkey") @default(autoincrement())
   tipo                         String    @db.VarChar(10)
   captura_data_hora            DateTime? @db.Timestamptz(6)
@@ -26,14 +26,20 @@ model telemetrias {
   faixa                        String?   @db.VarChar(10)
   ultimo_enviado_id            Int
   arquivo_nome                 String?   @db.VarChar(255)
-  status_cpu                   String?
-  status_ram                   String?
-  status_disco                 String?
-  status_rede                  String?
-  ping_sefaz                   String?
-  ping_camera                  String?
   camera_latitude              String?   @db.VarChar(255)
   camera_longitude             String?   @db.VarChar(255)
   camera_endereco              String?   @db.VarChar(255)
   created_at                   DateTime  @default(now())
+}
+
+model telemetrias_hardware {
+  id            BigInt   @id @default(autoincrement())
+  camera_codigo String?
+  status_cpu    String?
+  status_ram    String?
+  status_disco  String?
+  status_rede   String?
+  ping_sefaz    String?
+  ping_camera   String?
+  created_at    DateTime @default(now())
 }
