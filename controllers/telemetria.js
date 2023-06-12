@@ -42,6 +42,8 @@ router.post('/hardware', async (req, res) => {
     return res.status(500).json(error.message);
   }
 
+  resultado.id = parseInt(resultado.id);
+
   return res.json(resultado);
 
 });
