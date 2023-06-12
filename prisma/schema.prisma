@@ -33,13 +33,14 @@ model telemetrias_ocr {
 }
 
 model telemetrias_hardware {
-  id            BigInt   @id @default(autoincrement())
-  camera_codigo String?
-  status_cpu    String?
-  status_ram    String?
-  status_disco  String?
-  status_rede   String?
-  ping_sefaz    String?
-  ping_camera   String?
-  created_at    DateTime @default(now())
+  id                BigInt   @id @default(autoincrement())
+  camera_codigo     String?
+  status_cpu        String?
+  status_ram        String?
+  status_disco      String?
+  status_rede       String?
+  ping_sefaz        String?
+  ping_camera       String?
+  created_at        DateTime @default(now())
+  ultimo_enviado_id Int
 }
