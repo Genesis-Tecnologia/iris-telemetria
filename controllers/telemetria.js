@@ -26,7 +26,7 @@ router.post('/ocr', async (req, res) => {
 
   resultado.id = parseInt(resultado.id)
 
-  return res.json(resultado)
+  return res.json(resultado);
 });
 
 router.post('/hardware', async (req, res) => {
@@ -39,7 +39,6 @@ router.post('/hardware', async (req, res) => {
       data: body
     });
   } catch (error) {
-    console.log(error)
     return res.status(500).json(error.message);
   }
 
