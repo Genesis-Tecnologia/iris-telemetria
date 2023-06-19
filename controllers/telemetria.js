@@ -35,8 +35,9 @@ router.put('/ocr/:id', async (req, res) => {
   const { id } = params;
 
 
+
   const telemetria = await prisma.telemetrias_ocr.update({
-    where: { id },
+    where: { id: parseInt(id) },
     data: { body }
   });
 
