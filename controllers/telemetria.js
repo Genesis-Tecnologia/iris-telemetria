@@ -34,12 +34,14 @@ router.put('/ocr/:id', async (req, res) => {
   const { body } = req;
   const { id } = params;
 
-
-
-  const telemetria = await prisma.telemetrias_ocr.update({
-    where: { id: parseInt(id) },
-    data: body
-  });
+  try {
+    const telemetria = await prisma.telemetrias_ocr.update({
+      where: { id: parseInt(id) },
+      data: body
+    });
+  } catch (error) {
+    return res.status(500).json(erro.message)
+  }
 
   return res.json(telemetria);
 });
