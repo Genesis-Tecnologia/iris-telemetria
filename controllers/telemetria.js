@@ -29,6 +29,20 @@ router.post('/ocr', async (req, res) => {
   return res.json(resultado);
 });
 
+router.put('/ocr/:id', async (req, res) => {
+  const { params } = req;
+  const { body } = req;
+  const { id } = params;
+
+
+  const telemetria = await prisma.telemetrias_ocr.update({
+    where: { id },
+    data: { body }
+  });
+
+  return res.json(telemetria);
+});
+
 router.post('/hardware', async (req, res) => {
   const { body } = req;
 
