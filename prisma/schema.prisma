@@ -18,7 +18,6 @@ model telemetrias_ocr {
   placa_tipo                   String?   @db.VarChar(25)
   placa_totalmente_reconhecida Boolean?
   sentido                      String?   @db.VarChar(255)
-  camera_nome                  String?   @db.VarChar(255)
   camera_codigo                String?   @db.VarChar(255)
   veiculo_tipo                 String?   @db.VarChar(50)
   veiculo_cor                  String?   @db.VarChar(50)
@@ -26,10 +25,11 @@ model telemetrias_ocr {
   faixa                        String?   @db.VarChar(10)
   ultimo_enviado_id            Int
   arquivo_nome                 String?   @db.VarChar(255)
-  camera_latitude              String?   @db.VarChar(255)
-  camera_longitude             String?   @db.VarChar(255)
-  camera_endereco              String?   @db.VarChar(255)
   created_at                   DateTime  @default(now())
+  cliente_status               String?
+  captura_resolucao_altura     String?
+  captura_resolucao_largura    String?
+  captura_tamanho              String?
 }
 
 model telemetrias_hardware {
