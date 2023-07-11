@@ -3,8 +3,14 @@ const router = express.Router();
 const prisma = require('../prisma/connection.js')
 const dayjs = require('dayjs');
 
+const handleResolutionFromBody = ({ captura_resolucao_altura, captura_resolucao_largura }) => {
+  return `${captura_resolucao_altura} x ${captura_resolucao_largura}`;
+}
+
 router.post('/ocr', async (req, res) => {
   const { body } = req;
+
+  const captura_resolucao = handleResolutionFromBody(body);
 
   const telemetria = {  
     ...body,
@@ -12,6 +18,7 @@ router.post('/ocr', async (req, res) => {
     registro_data_hora: body.registro_data_hora !== null ? dayjs(body.registro_data_hora).toISOString() : body.registro_data_hora,
     envio_tentativa_data_hora: body.envio_tentativa_data_hora !== null ? dayjs(body.envio_tentativa_data_hora).toISOString() : body.envio_tentativa_data_hora,
     envio_data_hora: body.envio_data_hora !== null ? dayjs(body.envio_data_hora).toISOString() : body.envio_data_hora,
+    captura_resolucao
   }
 
   let resultado;
