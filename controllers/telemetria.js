@@ -21,6 +21,9 @@ router.post('/ocr', async (req, res) => {
     captura_resolucao
   }
 
+  delete telemetria.captura_resolucao_altura
+  delete telemetria.captura_resolucao_largura
+
   let resultado;
 
   try {
