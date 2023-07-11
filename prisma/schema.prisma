@@ -27,9 +27,8 @@ model telemetrias_ocr {
   arquivo_nome                 String?   @db.VarChar(255)
   created_at                   DateTime  @default(now())
   cliente_status               String?
-  captura_resolucao_altura     String?
-  captura_resolucao_largura    String?
   captura_tamanho              String?
+  captura_resolucao            String?
 }
 
 model telemetrias_hardware {
