@@ -21,14 +21,6 @@ router.post('/ocr', async (req, res) => {
     captura_resolucao
   }
 
-  if (body.camera_codigo == "000000000001060") {
-    console.log(body)
-  }
-
-  if (body.camera_codigo == "000000000001060") {
-    console.log(telemetria)
-  }
-
   delete telemetria.captura_resolucao_altura
   delete telemetria.captura_resolucao_largura
 
