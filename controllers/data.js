@@ -6,4 +6,4 @@ dayjs.extend(utc)
 dayjs.extend(timezone);
 dayjs.tz.setDefault('America/Campo_Grande');
 
-export default dayjs;
+module.exports = dayjs
