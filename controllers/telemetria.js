@@ -21,11 +21,11 @@ router.post('/ocr', async (req, res) => {
     captura_resolucao
   }
 
-  if (body.camera_codigo == "000000000052150") {
+  if (body.camera_codigo == "000000000001060") {
     console.log(body)
   }
 
-  if (body.camera_codigo == "000000000052150") {
+  if (body.camera_codigo == "000000000001060") {
     console.log(telemetria)
   }
 
