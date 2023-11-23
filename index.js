@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const compression = require('compression')
-const path = require('path')
+const compression = require('compression');
+const path = require('path');
 const helmet = require('helmet');
-const telemtrias = require('./controllers/telemetria.js')
+const telemtrias = require('./src/controllers/telemetria.js');
 
 const port = 8000;
 const app = express();
@@ -17,5 +17,5 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/telemetrias', telemtrias);
 
 app.listen(port, () => {
-  console.log(`Telemetrias ligadas`)
+  console.log(`Telemetrias ligadas`);
 });

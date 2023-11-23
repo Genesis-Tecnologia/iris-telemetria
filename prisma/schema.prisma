@@ -8,38 +8,245 @@ datasource db {
 }
 
 model telemetrias_ocr {
-  id                           BigInt    @id(map: "api_telemetria_pkey") @default(autoincrement())
-  tipo                         String    @db.VarChar(10)
-  captura_data_hora            DateTime? @db.Timestamptz(6)
-  registro_data_hora           DateTime? @db.Timestamptz(6)
-  envio_tentativa_data_hora    DateTime? @db.Timestamptz(6)
-  envio_data_hora              DateTime? @db.Timestamptz(6)
-  placa                        String?   @db.VarChar(255)
-  placa_tipo                   String?   @db.VarChar(25)
-  placa_totalmente_reconhecida Boolean?
-  sentido                      String?   @db.VarChar(255)
-  camera_codigo                String?   @db.VarChar(255)
-  veiculo_tipo                 String?   @db.VarChar(50)
-  veiculo_cor                  String?   @db.VarChar(50)
-  velocidade                   String?   @db.VarChar(50)
-  faixa                        String?   @db.VarChar(10)
-  ultimo_enviado_id            Int
-  arquivo_nome                 String?   @db.VarChar(255)
-  created_at                   DateTime  @default(now())
-  cliente_status               String?
-  captura_tamanho              String?
-  captura_resolucao            String?
+  id                               BigInt    @id(map: "api_telemetria_pkey") @default(autoincrement())
+  tipo                             String?   @db.VarChar(10)
+  captura_data_hora                DateTime? @db.Timestamptz(6)
+  registro_data_hora               DateTime? @db.Timestamptz(6)
+  envio_tentativa_data_hora        DateTime? @db.Timestamptz(6)
+  envio_data_hora                  DateTime? @db.Timestamptz(6)
+  placa                            String?   @db.VarChar(255)
+  placa_tipo                       String?   @db.VarChar(25)
+  placa_totalmente_reconhecida     Boolean?
+  sentido                          String?   @db.VarChar(255)
+  camera_codigo                    String?   @db.VarChar(255)
+  veiculo_tipo                     String?   @db.VarChar(50)
+  veiculo_cor                      String?   @db.VarChar(50)
+  velocidade                       String?   @db.VarChar(50)
+  faixa                            String?   @db.VarChar(10)
+  ultimo_enviado_id                Int?
+  arquivo_nome                     String?   @db.VarChar(255)
+  created_at                       DateTime? @default(now())
+  captura_tamanho                  String?
+  cliente_status                   String?
+  captura_resolucao                String?
+  t_registro_data_hora             DateTime? @db.Timestamptz(6)
+  t_envio_tentativa_data_hora      DateTime? @db.Timestamptz(6)
+  t_deletado_duplicado             Boolean?
+  t_registro_data_hora_fake        Boolean?
+  t_envio_tentativa_data_hora_fake Boolean?
+
+  @@index([camera_codigo])
+  @@index([captura_data_hora, camera_codigo], map: "telemetrias_ocr_captura_data_hora_idx")
+  @@index([placa])
 }
 
-model telemetrias_hardware {
-  id                BigInt   @id @default(autoincrement())
-  camera_codigo     String?
-  status_cpu        String?
-  status_ram        String?
-  status_disco      String?
-  status_rede       String?
-  ping_sefaz        String?
-  ping_camera       String?
-  created_at        DateTime @default(now())
-  ultimo_enviado_id Int
+model fr_grupo {
+  grp_codigo            Int
+  sis_codigo            String  @db.VarChar(3)
+  grp_nome              String  @db.VarChar(40)
+  grp_filtro_dicionario String? @db.VarChar(2000)
+
+  @@id([grp_codigo, sis_codigo])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model fr_log {
+  log String? @db.VarChar(6000)
+
+  @@ignore
+}
+
+model fr_log_event {
+  log_id        Int       @id
+  log_data      DateTime? @db.Timestamp(6)
+  log_hora      String?   @db.VarChar(8)
+  log_codform   Int?
+  log_descform  String?   @db.VarChar(100)
+  log_operacao  String?   @db.VarChar(1)
+  log_usuario   String?   @db.VarChar(30)
+  log_sistema   String?   @db.VarChar(3)
+  log_chave     String?   @db.VarChar(200)
+  log_chavecont String?   @db.VarChar(128)
+  log_conteudo  String?
+  log_ip        String?   @db.Char(20)
+}
+
+model fr_permissao {
+  per_codigo     Int    @id
+  grp_codigo     Int
+  sis_codigo     String @db.VarChar(3)
+  rel_codigo     Int?
+  frm_codigo     Int?
+  com_codigo     Int?
+  mnu_codigo     Int?
+  per_adicionar  String @default("N") @db.VarChar(1)
+  per_excluir    String @default("N") @db.VarChar(1)
+  per_editar     String @default("N") @db.VarChar(1)
+  per_visualizar String @default("N") @db.VarChar(1)
+  per_habilitado String @default("N") @db.VarChar(1)
+}
+
+model fr_regras {
+  reg_cod        Int       @id
+  reg_nome       String?   @db.VarChar(255)
+  reg_descricao  String?
+  reg_params     String?
+  reg_variaveis  String?
+  reg_params_out String?
+  reg_interface  String?
+  reg_script     String?
+  reg_data       DateTime? @db.Timestamp(6)
+  reg_hora       DateTime? @db.Timestamp(6)
+  reg_compilada  String?   @db.VarChar(1)
+  reg_destino    Int?
+  reg_hash       String?   @db.VarChar(50)
+  cat_cod        Int?      @default(1)
+  usr_codigo     Int?
+}
+
+model fr_sessao {
+  ses_conexao        Int       @id
+  ses_datahora_login DateTime? @db.Timestamp(6)
+  ses_usuario        String?   @db.VarChar(20)
+  ses_nome_usuario   String?   @db.VarChar(40)
+  ses_nome_maquina   String?   @db.VarChar(40)
+  ses_end_ip         String?   @db.VarChar(20)
+  sis_codigo         String?   @db.VarChar(3)
+}
+
+model fr_sistema {
+  sis_codigo            String   @id @db.VarChar(3)
+  sis_descricao         String   @db.VarChar(30)
+  img_codigo            Int?
+  img_codigo_icone      Int?
+  sis_sqldatalimite     String?  @db.VarChar(2000)
+  sis_sqldadosentidade  String?  @db.VarChar(2000)
+  sis_sqlinformacoes    String?  @db.VarChar(2000)
+  sis_check             String?  @db.VarChar(30)
+  sis_acessoexterno     Boolean?
+  sis_grupoexterno      Int?
+  sis_informacao        String?  @db.VarChar(2000)
+  sis_resumo            String?  @db.VarChar(1000)
+  sis_unique_identifier String?  @db.Char(36)
+}
+
+model fr_tarefa {
+  trf_codigo           Int       @id
+  trf_descricao        String    @db.VarChar(255)
+  sis_codigo           String    @db.VarChar(3)
+  reg_codigo           Int
+  trf_data_inicial     DateTime? @db.Timestamp(6)
+  trf_data_final       DateTime? @db.Timestamp(6)
+  trf_ativa            String    @db.VarChar(1)
+  trf_regra_parametros String?
+  trf_tipo_agendamento String?   @db.VarChar(15)
+}
+
+model fr_tarefa_tempo {
+  trt_codigo Int    @id
+  trf_codigo Int
+  trt_tipo   String @db.VarChar(15)
+  trt_valor  Int
+}
+
+model fr_usuario {
+  usr_codigo           Int       @id
+  usr_login            String    @unique(map: "fr_usuario_fr_login_idx") @db.VarChar(20)
+  usr_senha            String?   @db.VarChar(64)
+  usr_administrador    String    @default("N") @db.VarChar(1)
+  usr_tipo_expiracao   String    @default("N") @db.VarChar(1)
+  usr_dias_expiracao   Int?
+  usr_imagem_digital   Bytes?
+  usr_foto             Bytes?
+  usr_nome             String    @db.VarChar(60)
+  usr_email            String?   @db.VarChar(120)
+  usr_digital          BigInt?
+  usr_inicio_expiracao DateTime? @db.Timestamp(6)
+}
+
+model fr_usuario_grupo {
+  grp_codigo Int
+  sis_codigo String @db.VarChar(3)
+  usr_codigo Int
+
+  @@id([grp_codigo, sis_codigo, usr_codigo])
+}
+
+model fr_usuario_sistema {
+  usr_codigo           Int
+  sis_codigo           String @db.VarChar(3)
+  uss_acesso_externo   String @default("N") @db.VarChar(1)
+  uss_administrador    String @default("N") @db.VarChar(1)
+  uss_acesso_maker     String @default("N") @db.VarChar(1)
+  uss_criar_formulario String @default("N") @db.VarChar(1)
+  uss_criar_relatorio  String @default("N") @db.VarChar(1)
+  uss_acessar          String @default("N") @db.VarChar(1)
+  uss_criar_regra      String @default("N") @db.VarChar(1)
+
+  @@id([usr_codigo, sis_codigo])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model script {
+  script String?
+
+  @@ignore
+}
+
+model telemetria_equipamentos {
+  id                     Int     @unique(map: "telemetrias_equipamentos_id_idx") @default(autoincrement())
+  id_localidade          Int?
+  id_sentido_leitura     Int?
+  endereco               String? @db.VarChar
+  longitude              String? @db.VarChar
+  latitude               String? @db.VarChar
+  camera_codigo          String? @unique(map: "telemetrias_equipamentos_camera_codigo_idx") @db.VarChar(15)
+  id_tipo_internet       Int?
+  id_tipo_energia        Int?
+  id_local_instalado     Int?
+  tamanho_imagem         Int?
+  resolucao_imagem       String? @db.VarChar
+  latencia_captura_manha Int?
+  latencia_captura_tarde Int?
+  latencia_captura_noite Int?
+}
+
+model telemetria_local_instalado {
+  id                       Int       @id(map: "telemetria_local_instalado_pk") @default(autoincrement())
+  local                    String?   @db.VarChar
+  latencia_recebimento_max DateTime? @db.Time(6)
+  latencia_leitura_max     DateTime? @db.Time(6)
+  tamanho_imagem           Int?
+  resolucao_imagem         Int?
+
+  @@index([id])
+}
+
+model telemetria_localidades {
+  localidade String? @db.VarChar
+  uf         String? @db.VarChar(2)
+  id         Int     @unique(map: "telemetria_localidades_id_idx") @default(autoincrement())
+}
+
+model telemetria_sentido_leitura {
+  id   Int     @id(map: "telemetria_sentido_leitura_pk") @default(autoincrement())
+  nome String? @db.VarChar
+
+  @@index([id])
+}
+
+model telemetria_tipo_energia {
+  id   Int     @id(map: "telemetria_tipo_energia_pk") @unique(map: "telemetria_tipo_energia_un") @default(autoincrement())
+  tipo String? @db.VarChar
+
+  @@index([id])
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model telemetria_tipo_internet {
+  id              Int     @default(autoincrement())
+  tipo            String? @db.VarChar
+  velocidade_link Int?
+
+  @@ignore
 }

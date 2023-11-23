@@ -18,11 +18,12 @@ router.post('/ocr', async (req, res) => {
     registro_data_hora: body.registro_data_hora !== null ? dayjs(body.registro_data_hora).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z' : body.registro_data_hora,
     envio_tentativa_data_hora: body.envio_tentativa_data_hora !== null ? dayjs(body.envio_tentativa_data_hora).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z' : body.envio_tentativa_data_hora,
     envio_data_hora: body.envio_data_hora !== null ? dayjs(body.envio_data_hora).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z' : body.envio_data_hora,
+    created_at: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z',
     captura_resolucao
   }
 
-  delete telemetria.captura_resolucao_altura
-  delete telemetria.captura_resolucao_largura
+  delete telemetria.captura_resolucao_altura;
+  delete telemetria.captura_resolucao_largura;
 
   let resultado;
 
