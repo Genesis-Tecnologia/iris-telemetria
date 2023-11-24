@@ -24,6 +24,26 @@ class Notificacao {
         return response;
     }
 
+    async buildMessage(equipamento, minutosSemReceber) {
+        const { id_localidade, id_sentido_leitura } = equipamento;
+        const localidade = await prisma.telemetria_localidades.findFirst({ where: { id: id_localidade } });
+        const sentido = await prisma.telemetria_sentido_leitura.findFirst({ where: { id: id_sentido_leitura } });
+        let mensagem = `${localidade.localidade} (${sentido.nome}) ESTÁ A `;
+
+        if (minutosSemReceber > 59) {
+            const horasSemRecber = Math.round(minutosSemReceber /  60);
+            if (horasSemRecber < 2) {
+                mensagem += `${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
+            } else {
+                mensagem += `${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
+            }
+
+            return mensagem;
+        }
+
+        return `${localidade.localidade} (${sentido.nome}) ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
+    }
+
     async notificar() {
         const equipamentos = await prisma.telemetria_equipamentos.findMany();
         await equipamentos.forEach(async equipamento => {
@@ -34,10 +54,48 @@ class Notificacao {
                 take: 1
             });
 
-            if (dayjs(ultimoRegistro.created_at).subtract(equipamento.latencia, '')) {
-
+            const turnoAtual = this.getTurnoAtual();
+            const campoLatencia = this.getCampoLatencia(turnoAtual);
+            const latenciaUltimoRegistro = equipamento[campoLatencia];
+            const minutosSemEnviar = dayjs().diff(ultimoRegistro.created_at, 'minute')
+            if(minutosSemEnviar > latenciaUltimoRegistro) {
+                const message = await this.buildMessage(equipamento, minutosSemEnviar);
+                await this.sendMessage(message);
             }
-        })
+        });
+    }
+
+    getTurnoAtual() {
+        const diaAtual = dayjs().format('YYYY-MM-DD');
+        let manha = `${diaAtual} 05:20:00`;
+        let tarde = `${diaAtual} 12:00:00`;
+        let noite = `${diaAtual} 17:40:00`;
+
+        const ehManha = dayjs().isBetween(manha, tarde, 'hour');
+        if (ehManha) {
+            return 'MANHA';
+        }
+
+        const ehTarde = dayjs().isBetween(tarde, noite);
+        if (ehTarde) {
+            return 'TARDE';
+        }
+
+        return 'NOITE';
+    }
+
+    getCampoLatencia(turnoAtual) {
+        switch (turnoAtual) {
+            case 'MANHA':
+                return  'latencia_captura_manha';
+
+            case 'TARDE':
+                return 'latencia_captura_tarde';
+
+            default:
+                return 'latencia_captura_noite'
+
+        }
     }
 }
 
