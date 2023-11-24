@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const prisma = require('../prisma/connection.js')
+const prisma = require('../../prisma/connection.js')
 const dayjs = require('./data');
 
 const handleResolutionFromBody = ({ captura_resolucao_altura, captura_resolucao_largura }) => {
