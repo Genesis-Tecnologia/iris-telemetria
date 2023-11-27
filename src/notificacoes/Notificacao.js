@@ -10,6 +10,15 @@ class Notificacao {
         this.chat_id = -4037863483;
     }
 
+    getEmojis(emoji) {
+        const emojis = {
+            'NAO_ENVIANDO': '\u274c',
+            'ENVIANDO': '\u2705'
+        }
+
+        return emojis[emoji];
+    }
+
     async sendMessage(text) {
         let response;
         try {
@@ -24,31 +33,65 @@ class Notificacao {
         return response;
     }
 
-    async buildMessage(equipamento, minutosSemReceber) {
+    async buildMessage(naoEnviando, equipamento, minutosSemReceber) {
         const { id_localidade, id_sentido_leitura } = equipamento;
         const localidade = await prisma.telemetria_localidades.findFirst({ where: { id: id_localidade } });
         const sentido = await prisma.telemetria_sentido_leitura.findFirst({ where: { id: id_sentido_leitura } });
-        let mensagem = `${localidade.localidade} (${sentido.nome}) ESTÁ A `;
 
-        if (minutosSemReceber > 59) {
-            const horasSemRecber = Math.round(minutosSemReceber /  60);
-            if (horasSemRecber < 2) {
-                mensagem += `${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
-            } else {
-                mensagem += `${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
-            }
-
-            return mensagem;
+        if (naoEnviando) {
+            return this.buildNotSendingMessage(localidade, sentido, minutosSemReceber);
         }
 
-        return `${localidade.localidade} (${sentido.nome}) ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
+        return this.buildReturnedToSendMessage(equipamento, minutosSemReceber);
     }
+
+    buildNotSendingMessage(localidade, sentido, minutosSemReceber){
+        const emoji = this.getEmojis('NAO_ENVIANDO');
+        let mensagem = `${emoji} ${localidade.localidade} (${sentido.nome}) ESTÁ A `;
+
+        if (minutosSemReceber <= 59) {
+            return `${localidade.localidade} (${sentido.nome}) ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
+        }
+
+        const horasSemRecber = Math.round(minutosSemReceber /  60);
+        if (horasSemRecber < 2) {
+            mensagem += `${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
+        } else {
+            mensagem += `${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
+        }
+
+        return mensagem;
+    }
+
+    buildReturnedToSendMessage(localidade, sentido, minutosSemReceber) {
+        const emoji = this.getEmojis('ENVIANDO');
+        let message = `${emoji} ${localidade.localidade} (${sentido.nome})`;
+
+        if (minutosSemReceber < 59) {
+            message += ` - ${minutosSemReceber} MINUTOS SEM ENVIAR`;
+            return message;
+        }
+
+        const horasSemReceber = Math.round(minutosSemReceber / 60);
+
+        if (horasSemReceber < 2) {
+            message += ` - ${horasSemReceber} HORA SEM ENVIAR`;
+            return message;
+        }
+
+        message += ` - ${horasSemReceber} HORAS SEM ENVIAR`;
+        return message;
+    }
+
+
 
     async notificar() {
         const equipamentos = await prisma.telemetria_equipamentos.findMany();
-        await equipamentos.forEach(async equipamento => {
+        const equipamentosNaoEnviando = equipamentos.filter(equipamento => equipamento.data_hora_ultima_telemetria);
+
+        for (const equipamento of equipamentos) {
             const ultimoRegistro = await prisma.telemetrias_ocr.findFirst({
-                select: { created_at: true },
+                select: { created_at: true, id: true },
                 where: { camera_codigo: equipamento.camera_codigo },
                 orderBy: { id: 'desc' },
                 take: 1
@@ -57,12 +100,35 @@ class Notificacao {
             const turnoAtual = this.getTurnoAtual();
             const campoLatencia = this.getCampoLatencia(turnoAtual);
             const latenciaUltimoRegistro = equipamento[campoLatencia];
-            const minutosSemEnviar = dayjs().diff(ultimoRegistro.created_at, 'minute')
+            let minutosSemEnviar = dayjs().diff(ultimoRegistro.created_at, 'minute');
+
             if(minutosSemEnviar > latenciaUltimoRegistro) {
-                const message = await this.buildMessage(equipamento, minutosSemEnviar);
+                await prisma.telemetrias_equipamentos.update({
+                    where: { id: equipamento.id },
+                    data: { data_hora_ultima_telemetria: ultimoRegistro.created_at }
+                });
+
+                const message = await this.buildMessage(true, equipamento, minutosSemEnviar);
                 await this.sendMessage(message);
+
+            } else if(equipamentosNaoEnviando.length > 0) {
+                const equipamentoNaoEnviando = equipamentosNaoEnviando.filter(equipamentoNaoEnviando => {
+                    return equipamentoNaoEnviando.id = equipamento.id && equipamentoNaoEnviando.data_hora_ultima_telemetria !== null;
+                });
+
+                if (equipamentoNaoEnviando) {
+                    minutosSemEnviar = dayjs().diff(equipamentoNaoEnviando.data_hora_ultima_telemetria, 'minute');
+
+                    await prisma.telemetrias_equipamentos.update({
+                        where: { id: equipamentoNaoEnviando.id },
+                        data: { data_hora_ultima_telemetria: null }
+                    });
+
+                    const message = await this.buildMessage(false, equipamento, minutosSemEnviar);
+                    await this.sendMessage(message);
+                }
             }
-        });
+        }
     }
 
     getTurnoAtual() {

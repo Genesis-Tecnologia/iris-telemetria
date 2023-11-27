@@ -194,21 +194,22 @@ model script {
 }
 
 model telemetria_equipamentos {
-  id                     Int     @unique(map: "telemetrias_equipamentos_id_idx") @default(autoincrement())
-  id_localidade          Int?
-  id_sentido_leitura     Int?
-  endereco               String? @db.VarChar
-  longitude              String? @db.VarChar
-  latitude               String? @db.VarChar
-  camera_codigo          String? @unique(map: "telemetrias_equipamentos_camera_codigo_idx") @db.VarChar(15)
-  id_tipo_internet       Int?
-  id_tipo_energia        Int?
-  id_local_instalado     Int?
-  tamanho_imagem         Int?
-  resolucao_imagem       String? @db.VarChar
-  latencia_captura_manha Int?
-  latencia_captura_tarde Int?
-  latencia_captura_noite Int?
+  id                          Int       @unique(map: "telemetrias_equipamentos_id_idx") @default(autoincrement())
+  id_localidade               Int?
+  id_sentido_leitura          Int?
+  endereco                    String?   @db.VarChar
+  longitude                   String?   @db.VarChar
+  latitude                    String?   @db.VarChar
+  camera_codigo               String?   @unique(map: "telemetrias_equipamentos_camera_codigo_idx") @db.VarChar(15)
+  id_tipo_internet            Int?
+  id_tipo_energia             Int?
+  id_local_instalado          Int?
+  tamanho_imagem              Int?
+  resolucao_imagem            String?   @db.VarChar
+  latencia_captura_manha      Int?
+  latencia_captura_tarde      Int?
+  latencia_captura_noite      Int?
+  data_hora_ultima_telemetria DateTime? @db.Timestamptz(6)
 }
 
 model telemetria_local_instalado {
