@@ -113,7 +113,9 @@ class Notificacao {
                     return equipamentoNaoEnviando.id === equipamento.id && equipamentoNaoEnviando.data_hora_ultima_telemetria !== null;
                 })[0];
 
-                await this.notificarQueVoltouAEnviar(equipamentoNaoEnviando)
+                if (equipamentoNaoEnviando) {
+                    await this.notificarQueVoltouAEnviar(equipamentoNaoEnviando)
+                }
             }
         }
     }
