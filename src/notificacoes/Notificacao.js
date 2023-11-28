@@ -21,6 +21,7 @@ class Notificacao {
 
     async sendMessage(text) {
         let response;
+
         try {
             response = await this.request.post(this.url, {
                 text, chat_id: this.chat_id
@@ -42,7 +43,7 @@ class Notificacao {
             return this.buildNotSendingMessage(localidade, sentido, minutosSemReceber);
         }
 
-        return this.buildReturnedToSendMessage(equipamento, minutosSemReceber);
+        return this.buildReturnedToSendMessage(localidade, sentido, minutosSemReceber);
     }
 
     buildNotSendingMessage(localidade, sentido, minutosSemReceber){
@@ -102,31 +103,17 @@ class Notificacao {
             const latenciaUltimoRegistro = equipamento[campoLatencia];
             let minutosSemEnviar = dayjs().diff(ultimoRegistro.created_at, 'minute');
 
-            if(minutosSemEnviar > latenciaUltimoRegistro) {
-                await prisma.telemetrias_equipamentos.update({
-                    where: { id: equipamento.id },
-                    data: { data_hora_ultima_telemetria: ultimoRegistro.created_at }
-                });
+            await setTimeout(function() {}, 2000);
 
-                const message = await this.buildMessage(true, equipamento, minutosSemEnviar);
-                await this.sendMessage(message);
+            if(minutosSemEnviar > latenciaUltimoRegistro) {
+                await this.notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar);
 
             } else if(equipamentosNaoEnviando.length > 0) {
                 const equipamentoNaoEnviando = equipamentosNaoEnviando.filter(equipamentoNaoEnviando => {
-                    return equipamentoNaoEnviando.id = equipamento.id && equipamentoNaoEnviando.data_hora_ultima_telemetria !== null;
-                });
+                    return equipamentoNaoEnviando.id === equipamento.id && equipamentoNaoEnviando.data_hora_ultima_telemetria !== null;
+                })[0];
 
-                if (equipamentoNaoEnviando) {
-                    minutosSemEnviar = dayjs().diff(equipamentoNaoEnviando.data_hora_ultima_telemetria, 'minute');
-
-                    await prisma.telemetrias_equipamentos.update({
-                        where: { id: equipamentoNaoEnviando.id },
-                        data: { data_hora_ultima_telemetria: null }
-                    });
-
-                    const message = await this.buildMessage(false, equipamento, minutosSemEnviar);
-                    await this.sendMessage(message);
-                }
+                await this.notificarQueVoltouAEnviar(equipamentoNaoEnviando)
             }
         }
     }
@@ -162,6 +149,29 @@ class Notificacao {
                 return 'latencia_captura_noite'
 
         }
+    }
+
+    async notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar) {
+        await prisma.telemetria_equipamentos.update({
+            where: { id: equipamento.id },
+            data: { data_hora_ultima_telemetria: ultimoRegistro.created_at }
+        });
+
+        const message = await this.buildMessage(true, equipamento, minutosSemEnviar);
+        await this.sendMessage(message);
+    }
+
+    async notificarQueVoltouAEnviar(equipamento) {
+        let minutosSemEnviar = dayjs().diff(equipamento.data_hora_ultima_telemetria, 'minute');
+
+        await prisma.telemetria_equipamentos.update({
+            where: { id: equipamento.id },
+            data: { data_hora_ultima_telemetria: null }
+        });
+
+        const message = await this.buildMessage(false, equipamento, minutosSemEnviar);
+        await this.sendMessage(message);
+
     }
 }
 
