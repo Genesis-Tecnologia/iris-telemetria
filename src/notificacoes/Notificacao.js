@@ -152,9 +152,11 @@ class Notificacao {
     }
 
     async notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar) {
+        const data_hora_ultima_telemetria = dayjs(ultimoRegistro.created_at).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+
         await prisma.telemetria_equipamentos.update({
             where: { id: equipamento.id },
-            data: { data_hora_ultima_telemetria: ultimoRegistro.created_at }
+            data: { data_hora_ultima_telemetria }
         });
 
         const message = await this.buildMessage(true, equipamento, minutosSemEnviar);
