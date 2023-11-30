@@ -49,15 +49,15 @@ class Notificacao {
         let mensagem = `${emoji} ${nome_amigavel}\n`;
 
         if (minutosSemReceber <= 59) {
-            mensagem += `ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
+            mensagem += `\u231B ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
             return mensagem;
         }
 
         const horasSemRecber = Math.round(minutosSemReceber /  60);
         if (horasSemRecber < 2) {
-            mensagem += `ESTÁ A ${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
+            mensagem += `\u231B ESTÁ A ${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
         } else {
-            mensagem += `ESTÁ A ${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
+            mensagem += `\u231B ESTÁ A ${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
         }
 
         return mensagem;
@@ -68,18 +68,18 @@ class Notificacao {
         let message = `${emoji} ${nome_amigavel}\n`;
 
         if (minutosSemReceber < 59) {
-            message += `${minutosSemReceber} MINUTOS SEM ENVIAR`;
+            message += `\u231B ${minutosSemReceber} MINUTOS SEM ENVIAR`;
             return message;
         }
 
         const horasSemReceber = Math.round(minutosSemReceber / 60);
 
         if (horasSemReceber < 2) {
-            message += `${horasSemReceber} HORA SEM ENVIAR`;
+            message += `\u231B ${horasSemReceber} HORA SEM ENVIAR`;
             return message;
         }
 
-        message += `${horasSemReceber} HORAS SEM ENVIAR`;
+        message += `\u231B ${horasSemReceber} HORAS SEM ENVIAR`;
         return message;
     }
 
