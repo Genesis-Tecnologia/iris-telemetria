@@ -35,52 +35,51 @@ class Notificacao {
     }
 
     async buildMessage(naoEnviando, equipamento, minutosSemReceber) {
-        const { id_localidade, id_sentido_leitura } = equipamento;
-        const localidade = await prisma.telemetria_localidades.findFirst({ where: { id: id_localidade } });
-        const sentido = await prisma.telemetria_sentido_leitura.findFirst({ where: { id: id_sentido_leitura } });
+        const { nome_amigavel } = equipamento;
 
         if (naoEnviando) {
-            return this.buildNotSendingMessage(localidade, sentido, minutosSemReceber);
+            return this.buildNotSendingMessage(nome_amigavel, minutosSemReceber);
         }
 
-        return this.buildReturnedToSendMessage(localidade, sentido, minutosSemReceber);
+        return this.buildReturnedToSendMessage(nome_amigavel, minutosSemReceber);
     }
 
-    buildNotSendingMessage(localidade, sentido, minutosSemReceber){
+    buildNotSendingMessage(nome_amigavel, minutosSemReceber){
         const emoji = this.getEmojis('NAO_ENVIANDO');
-        let mensagem = `${emoji} ${localidade.localidade} (${sentido.nome}) ESTÁ A `;
+        let mensagem = `${emoji} ${nome_amigavel}\n`;
 
         if (minutosSemReceber <= 59) {
-            return `${localidade.localidade} (${sentido.nome}) ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
+            mensagem += `ESTÁ A ${minutosSemReceber} MINUTOS SEM ENVIAR TELEMETRIA`;
+            return mensagem;
         }
 
         const horasSemRecber = Math.round(minutosSemReceber /  60);
         if (horasSemRecber < 2) {
-            mensagem += `${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
+            mensagem += `ESTÁ A ${horasSemRecber} HORA SEM ENVIAR TELEMETRIA`;
         } else {
-            mensagem += `${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
+            mensagem += `ESTÁ A ${horasSemRecber} HORAS SEM ENVIAR TELEMETRIA`;
         }
 
         return mensagem;
     }
 
-    buildReturnedToSendMessage(localidade, sentido, minutosSemReceber) {
+    buildReturnedToSendMessage(nome_amigavel, minutosSemReceber) {
         const emoji = this.getEmojis('ENVIANDO');
-        let message = `${emoji} ${localidade.localidade} (${sentido.nome})`;
+        let message = `${emoji} ${nome_amigavel}\n`;
 
         if (minutosSemReceber < 59) {
-            message += ` - ${minutosSemReceber} MINUTOS SEM ENVIAR`;
+            message += `${minutosSemReceber} MINUTOS SEM ENVIAR`;
             return message;
         }
 
         const horasSemReceber = Math.round(minutosSemReceber / 60);
 
         if (horasSemReceber < 2) {
-            message += ` - ${horasSemReceber} HORA SEM ENVIAR`;
+            message += `${horasSemReceber} HORA SEM ENVIAR`;
             return message;
         }
 
-        message += ` - ${horasSemReceber} HORAS SEM ENVIAR`;
+        message += `${horasSemReceber} HORAS SEM ENVIAR`;
         return message;
     }
 
