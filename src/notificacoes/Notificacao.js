@@ -4,10 +4,10 @@ const dayjs = require('../controllers/data.js');
 
 class Notificacao {
     constructor() {
-        this.token = '6622635038:AAGripB9ZNBr7gqw1dH6DVaq2wUgykyRUOg';
+        this.token = process.env.TELEGRAM_TOKEN;
+        this.chat_id = process.env.TELEGRAM_CHAT_ID;
         this.url = `https://api.telegram.org/bot${this.token}/sendMessage`;
         this.request = axios;
-        this.chat_id = -4037863483;
     }
 
     getEmojis(emoji) {
@@ -88,6 +88,8 @@ class Notificacao {
     async notificar() {
         const equipamentos = await prisma.telemetria_equipamentos.findMany();
         const equipamentosNaoEnviando = equipamentos.filter(equipamento => equipamento.data_hora_ultima_telemetria);
+        const turnoAtual = this.getTurnoAtual();
+        const campoLatencia = this.getCampoLatencia(turnoAtual);
 
         for (const equipamento of equipamentos) {
             const ultimoRegistro = await prisma.telemetrias_ocr.findFirst({
@@ -97,16 +99,17 @@ class Notificacao {
                 take: 1
             });
 
-            const turnoAtual = this.getTurnoAtual();
-            const campoLatencia = this.getCampoLatencia(turnoAtual);
             const latenciaUltimoRegistro = equipamento[campoLatencia];
             let minutosSemEnviar = dayjs().diff(ultimoRegistro.created_at, 'minute');
 
-            await setTimeout(function() {}, 2000);
+            await setTimeout(function() {}, 3000);
 
             if(minutosSemEnviar > latenciaUltimoRegistro) {
-                await this.notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar);
-
+                if (equipamento.data_hora_ultima_notificacao === null) {
+                    await this.notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar);
+                } else if (dayjs().diff(equipamento.data_hora_ultima_notificacao, 'minute') >= 30) {
+                    await this.notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar);
+                }
             } else if(equipamentosNaoEnviando.length > 0) {
                 const equipamentoNaoEnviando = equipamentosNaoEnviando.filter(equipamentoNaoEnviando => {
                     return equipamentoNaoEnviando.id === equipamento.id && equipamentoNaoEnviando.data_hora_ultima_telemetria !== null;
@@ -154,10 +157,11 @@ class Notificacao {
 
     async notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar) {
         const data_hora_ultima_telemetria = dayjs(ultimoRegistro.created_at).format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+        const data_hora_ultima_notificacao = dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z'
 
         await prisma.telemetria_equipamentos.update({
             where: { id: equipamento.id },
-            data: { data_hora_ultima_telemetria }
+            data: { data_hora_ultima_telemetria, data_hora_ultima_notificacao }
         });
 
         const message = await this.buildMessage(true, equipamento, minutosSemEnviar);
@@ -169,7 +173,7 @@ class Notificacao {
 
         await prisma.telemetria_equipamentos.update({
             where: { id: equipamento.id },
-            data: { data_hora_ultima_telemetria: null }
+            data: { data_hora_ultima_telemetria: null, data_hora_ultima_notificacao: null }
         });
 
         const message = await this.buildMessage(false, equipamento, minutosSemEnviar);
