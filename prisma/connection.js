@@ -41,7 +41,7 @@ prisma.$use(async (params, next) => {
                 setOffsetTime(obj[key], fn);
             }
         }
-        obj[offsetKey] = true;
+        // obj[offsetKey] = true;
     };
 
     setOffsetTime(params.args, fixPrismaWriteDate);

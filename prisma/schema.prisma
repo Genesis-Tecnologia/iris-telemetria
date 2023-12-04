@@ -253,3 +253,18 @@ model telemetria_tipo_internet {
 
   @@ignore
 }
+
+model telemetria_hardware {
+  id                            Int       @id(map: "telemetria_hardware_pkey") @default(autoincrement())
+  id_local                      Int
+  tipo                          String
+  codigo_equipamento            String
+  status_cpu                    String?
+  status_ram                    String?
+  status_disk                   String?
+  status_network                String?
+  ping_equipamento              String?
+  ping_client                   String?
+  created_at                    DateTime? @default(now())
+  ultima_telemetria_hardware_id Int?
+}

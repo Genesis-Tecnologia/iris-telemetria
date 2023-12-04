@@ -59,20 +59,22 @@ router.put('/ocr/:id', async (req, res) => {
 
 router.post('/hardware', async (req, res) => {
   const { body } = req;
-
-  let resultado;
+  const { data } = body;
 
   try {
-    resultado = await prisma.telemetrias_hardware.create({
-      data: body
-    });
+      await prisma.telemetria_hardware.create({
+        data: {
+          ...data,
+          created_at: dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z'
+        }
+      });
   } catch (error) {
-    return res.status(500).json(error.message);
+      return res.status(500).json({
+        ok: false, message: error.message
+      });
   }
 
-  resultado.id = parseInt(resultado.id);
-
-  return res.json(resultado);
+  return res.json({ ok: true, message: 'Telemetria enviada com sucesso!' });
 
 });
 
