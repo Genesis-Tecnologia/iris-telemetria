@@ -86,7 +86,9 @@ class Notificacao {
 
 
     async notificar() {
-        const equipamentos = await prisma.telemetria_equipamentos.findMany();
+        const equipamentos = await prisma.telemetria_equipamentos.findMany({
+            where: { tipo: 'CAMERA' }
+        });
         const equipamentosNaoEnviando = equipamentos.filter(equipamento => equipamento.data_hora_ultima_telemetria);
         const turnoAtual = this.getTurnoAtual();
         const campoLatencia = this.getCampoLatencia(turnoAtual);
