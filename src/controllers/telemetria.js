@@ -7,6 +7,26 @@ const handleResolutionFromBody = ({ captura_resolucao_altura, captura_resolucao_
   return `${captura_resolucao_altura} x ${captura_resolucao_largura}`;
 }
 
+async function handlePublicIp(equipment_code, ip_publico) {
+  const equipment = await prisma.telemetria_equipamentos.findFirst({
+    where: {
+      camera_codigo: equipment_code
+    }
+  });
+
+  if (equipment.ip_publico !== ip_publico) {
+    await prisma.telemetria_equipamentos.update({
+      where: {
+        camera_codigo: equipment.camera_codigo
+      },
+      data: {
+        ip_publico
+      }
+    });
+  }
+
+}
+
 router.post('/ocr', async (req, res) => {
   const { body } = req;
 
@@ -60,6 +80,13 @@ router.put('/ocr/:id', async (req, res) => {
 router.post('/hardware', async (req, res) => {
   const { body } = req;
   const { data } = body;
+
+
+  if (data.public_ip && ( data.tipo === 'CT' || data.tipo === 'NUC')) {
+      await handlePublicIp(data.codigo_equipamento, data.public_ip);
+ }
+
+    delete data.public_ip;
 
   try {
       await prisma.telemetria_hardware.create({
