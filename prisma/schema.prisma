@@ -214,6 +214,7 @@ model telemetria_equipamentos {
   dt_ativacao_homologado       DateTime? @db.Date
   velocidade_link_internet     Int?
   ip_publico                   String?
+  tipo                         String?
 }
 
 model telemetria_local_instalado {
