@@ -8,32 +8,29 @@ datasource db {
 }
 
 model telemetrias_ocr {
-  id                               BigInt    @id(map: "api_telemetria_pkey") @default(autoincrement())
-  tipo                             String?   @db.VarChar(10)
-  captura_data_hora                DateTime? @db.Timestamptz(6)
-  registro_data_hora               DateTime? @db.Timestamptz(6)
-  envio_tentativa_data_hora        DateTime? @db.Timestamptz(6)
-  envio_data_hora                  DateTime? @db.Timestamptz(6)
-  placa                            String?   @db.VarChar(255)
-  placa_tipo                       String?   @db.VarChar(25)
-  placa_totalmente_reconhecida     Boolean?
-  sentido                          String?   @db.VarChar(255)
-  camera_codigo                    String?   @db.VarChar(255)
-  veiculo_tipo                     String?   @db.VarChar(50)
-  veiculo_cor                      String?   @db.VarChar(50)
-  velocidade                       String?   @db.VarChar(50)
-  faixa                            String?   @db.VarChar(10)
-  ultimo_enviado_id                Int?
-  arquivo_nome                     String?   @db.VarChar(255)
-  created_at                       DateTime? @default(now())
-  captura_tamanho                  String?
-  cliente_status                   String?
-  captura_resolucao                String?
-  t_registro_data_hora             DateTime? @db.Timestamptz(6)
-  t_envio_tentativa_data_hora      DateTime? @db.Timestamptz(6)
-  t_deletado_duplicado             Boolean?
-  t_registro_data_hora_fake        Boolean?
-  t_envio_tentativa_data_hora_fake Boolean?
+  id                             BigInt    @id(map: "api_telemetria_pkey") @default(autoincrement())
+  tipo                           String?   @db.VarChar(10)
+  captura_data_hora              DateTime? @db.Timestamptz(6)
+  registro_data_hora             DateTime? @db.Timestamptz(6)
+  envio_tentativa_data_hora      DateTime? @db.Timestamptz(6)
+  envio_data_hora                DateTime? @db.Timestamptz(6)
+  placa                          String?   @db.VarChar(255)
+  placa_tipo                     String?   @db.VarChar(25)
+  placa_totalmente_reconhecida   Boolean?
+  sentido                        String?   @db.VarChar(255)
+  camera_codigo                  String?   @db.VarChar(255)
+  veiculo_tipo                   String?   @db.VarChar(50)
+  veiculo_cor                    String?   @db.VarChar(50)
+  velocidade                     String?   @db.VarChar(50)
+  faixa                          String?   @db.VarChar(10)
+  ultimo_enviado_id              Int?
+  arquivo_nome                   String?   @db.VarChar(255)
+  created_at                     DateTime? @default(now())
+  captura_tamanho                String?
+  cliente_status                 String?
+  captura_resolucao              String?
+  fake_registro_data_hora        DateTime? @db.Timestamp(6)
+  fake_envio_tentativa_data_hora DateTime? @db.Timestamp(6)
 
   @@index([camera_codigo])
   @@index([captura_data_hora, camera_codigo], map: "telemetrias_ocr_captura_data_hora_idx")
@@ -212,15 +209,16 @@ model telemetria_equipamentos {
   data_hora_ultima_telemetria  DateTime? @db.Timestamptz(6)
   nome_amigavel                String?
   data_hora_ultima_notificacao DateTime?
+  latencia_recebimento_max     DateTime? @db.Time(6)
+  latencia_leitura_max         DateTime? @db.Time(6)
+  dt_ativacao_homologado       DateTime? @db.Date
+  velocidade_link_internet     Int?
+  ip_publico                   String?
 }
 
 model telemetria_local_instalado {
-  id                       Int       @id(map: "telemetria_local_instalado_pk") @default(autoincrement())
-  local                    String?   @db.VarChar
-  latencia_recebimento_max DateTime? @db.Time(6)
-  latencia_leitura_max     DateTime? @db.Time(6)
-  tamanho_imagem           Int?
-  resolucao_imagem         Int?
+  id    Int     @id(map: "telemetria_local_instalado_pk") @default(autoincrement())
+  local String? @db.VarChar
 
   @@index([id])
 }
@@ -247,15 +245,14 @@ model telemetria_tipo_energia {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model telemetria_tipo_internet {
-  id              Int     @default(autoincrement())
-  tipo            String? @db.VarChar
-  velocidade_link Int?
+  id   Int     @default(autoincrement())
+  tipo String? @db.VarChar
 
   @@ignore
 }
 
 model telemetria_hardware {
-  id                            Int       @id(map: "telemetria_hardware_pkey") @default(autoincrement())
+  id                            Int       @id @default(autoincrement())
   id_local                      Int
   tipo                          String
   codigo_equipamento            String
@@ -264,7 +261,7 @@ model telemetria_hardware {
   status_disk                   String?
   status_network                String?
   ping_equipamento              String?
-  ping_client                   String?
   created_at                    DateTime? @default(now())
   ultima_telemetria_hardware_id Int?
+  ping_client                   String?
 }

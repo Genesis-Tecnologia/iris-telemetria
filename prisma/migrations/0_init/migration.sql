@@ -21,11 +21,8 @@ CREATE TABLE "telemetrias_ocr" (
     "captura_tamanho" TEXT,
     "cliente_status" TEXT,
     "captura_resolucao" TEXT,
-    "t_registro_data_hora" TIMESTAMPTZ(6),
-    "t_envio_tentativa_data_hora" TIMESTAMPTZ(6),
-    "t_deletado_duplicado" BOOLEAN,
-    "t_registro_data_hora_fake" BOOLEAN,
-    "t_envio_tentativa_data_hora_fake" BOOLEAN,
+    "fake_registro_data_hora" TIMESTAMP(6),
+    "fake_envio_tentativa_data_hora" TIMESTAMP(6),
 
     CONSTRAINT "api_telemetria_pkey" PRIMARY KEY ("id")
 );
@@ -222,17 +219,20 @@ CREATE TABLE "telemetria_equipamentos" (
     "resolucao_imagem" VARCHAR,
     "latencia_captura_manha" INTEGER,
     "latencia_captura_tarde" INTEGER,
-    "latencia_captura_noite" INTEGER
+    "latencia_captura_noite" INTEGER,
+    "data_hora_ultima_telemetria" TIMESTAMPTZ(6),
+    "nome_amigavel" TEXT,
+    "data_hora_ultima_notificacao" TIMESTAMP(3),
+    "latencia_recebimento_max" TIME(6),
+    "latencia_leitura_max" TIME(6),
+    "dt_ativacao_homologado" DATE,
+    "velocidade_link_internet" INTEGER
 );
 
 -- CreateTable
 CREATE TABLE "telemetria_local_instalado" (
     "id" SERIAL NOT NULL,
     "local" VARCHAR,
-    "latencia_recebimento_max" TIME(6),
-    "latencia_leitura_max" TIME(6),
-    "tamanho_imagem" INTEGER,
-    "resolucao_imagem" INTEGER,
 
     CONSTRAINT "telemetria_local_instalado_pk" PRIMARY KEY ("id")
 );
@@ -263,8 +263,25 @@ CREATE TABLE "telemetria_tipo_energia" (
 -- CreateTable
 CREATE TABLE "telemetria_tipo_internet" (
     "id" SERIAL NOT NULL,
-    "tipo" VARCHAR,
-    "velocidade_link" INTEGER
+    "tipo" VARCHAR
+);
+
+-- CreateTable
+CREATE TABLE "telemetria_hardware" (
+    "id" SERIAL NOT NULL,
+    "id_local" INTEGER NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "codigo_equipamento" TEXT NOT NULL,
+    "status_cpu" TEXT,
+    "status_ram" TEXT,
+    "status_disk" TEXT,
+    "status_network" TEXT,
+    "ping_equipamento" TEXT,
+    "created_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "ultima_telemetria_hardware_id" INTEGER,
+    "ping_client" TEXT,
+
+    CONSTRAINT "telemetria_hardware_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
