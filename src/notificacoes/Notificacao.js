@@ -34,14 +34,32 @@ class Notificacao {
         return response;
     }
 
-    async buildMessage(naoEnviando, equipamento, minutosSemReceber) {
-        const { nome_amigavel } = equipamento;
+    async buildMessage(notSending, equipment, minutesLatency) {
+        const { nome_amigavel } = equipment;
 
-        if (naoEnviando) {
-            return this.buildNotSendingMessage(nome_amigavel, minutosSemReceber);
+        if (notSending) {
+            return this.buildNotSendingMessage(nome_amigavel, minutesLatency);
         }
 
-        return this.buildReturnedToSendMessage(nome_amigavel, minutosSemReceber);
+        if (notSending === null) {
+            return this.buildWithoutRecordsMessage(nome_amigavel, minutesLatency)
+        }
+
+        return this.buildReturnedToSendMessage(nome_amigavel, minutesLatency);
+    }
+
+    buildWithoutRecordsMessage(name, minutesLatency) {
+        const emoji = this.getEmojis('NAO_ENVIANDO');
+        let message = `${emoji} ${name}\n`;
+
+        const hoursLatency = Math.round(minutesLatency /  60);
+        if (hoursLatency < 2) {
+            message += `\u231B ESTÁ A ${hoursLatency} HORA SEM RECEBER TELEMETRIA`;
+        } else {
+            message += `\u231B ESTÁ A ${hoursLatency} HORAS SEM RECEBER TELEMETRIA`;
+        }
+
+        return message;
     }
 
     buildNotSendingMessage(nome_amigavel, minutosSemReceber){
@@ -101,6 +119,11 @@ class Notificacao {
                 take: 1
             });
 
+            if (! ultimoRegistro) {
+                await this.notificarSemRegistro(equipamento);
+                continue
+            }
+
             const latenciaUltimoRegistro = equipamento[campoLatencia];
             let minutosSemEnviar = dayjs().diff(ultimoRegistro.created_at, 'minute');
 
@@ -155,6 +178,22 @@ class Notificacao {
                 return 'latencia_captura_noite'
 
         }
+    }
+
+    async notificarSemRegistro(equipamento) {
+        let { id, data_hora_ultima_notificacao } = equipamento;
+
+        if (! data_hora_ultima_notificacao) {
+           data_hora_ultima_notificacao =  dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS') + 'Z';
+           await prisma.telemetria_equipamentos.update({
+               where: { id },
+               data: { data_hora_ultima_notificacao }
+           });
+        }
+
+        let minutesLatency = dayjs().diff(data_hora_ultima_notificacao, 'minute');
+        const message = await this.buildMessage(null, equipamento, minutesLatency);
+        await this.sendMessage(message);
     }
 
     async notificarNaoEnviando(equipamento, ultimoRegistro, minutosSemEnviar) {
