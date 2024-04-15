@@ -120,8 +120,11 @@ class Notificacao {
             });
 
             if (! ultimoRegistro) {
-                await this.notificarSemRegistro(equipamento);
-                continue
+                let { data_hora_ultima_notificacao } = equipamento
+                if (!data_hora_ultima_notificacao || (data_hora_ultima_notificacao && dayjs().diff(data_hora_ultima_notificacao, 'minute') > 5)) {
+                    await this.notificarSemRegistro(equipamento);
+                }
+                continue;
             }
 
             const latenciaUltimoRegistro = equipamento[campoLatencia];
